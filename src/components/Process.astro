@@ -1,0 +1,171 @@
+---
+import { workProcess } from '../data/profile';
+
+const total = workProcess.steps.length;
+---
+
+<section class="screen process" id="proses">
+  <div class="wrap">
+    <div class="panel dark">
+      <div class="process-head">
+        <h2 class="h-section">{workProcess.heading}</h2>
+        <p class="lead">{workProcess.lead}</p>
+      </div>
+
+      <ol class="steps">
+        {
+          workProcess.steps.map((s, i) => (
+            <li class="step">
+              <span class="progress" aria-hidden="true">
+                {Array.from({ length: total }, (_, k) => (
+                  <i class={k <= i ? 'on' : ''} />
+                ))}
+              </span>
+              <span class="num" aria-hidden="true">
+                0{i + 1}
+              </span>
+              <h3 class="step-title">
+                <span class="visually-hidden">Tahap {i + 1}: </span>
+                {s.title}
+              </h3>
+              <p class="step-body">{s.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .panel {
+    background: var(--ink);
+    color: var(--on-dark);
+    border-radius: var(--radius);
+    padding: clamp(32px, 5vw, 72px);
+  }
+
+  .process-head {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: end;
+    margin-bottom: clamp(48px, 7vw, 96px);
+  }
+
+  .process-head .h-section {
+    max-width: 14ch;
+  }
+
+  .process-head .lead {
+    color: var(--on-dark-muted);
+    justify-self: end;
+  }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid rgba(243, 240, 232, 0.24);
+  }
+
+  .step {
+    display: grid;
+    align-content: start;
+    gap: 16px;
+    padding: 24px 24px 8px 0;
+  }
+
+  .step + .step {
+    padding-left: 24px;
+    border-left: 1px solid rgba(243, 240, 232, 0.24);
+  }
+
+  /* bar progres piksel: menunjukkan posisi tahap dalam proyek */
+  .progress {
+    display: flex;
+    gap: 4px;
+  }
+
+  .progress i {
+    width: 12px;
+    height: 12px;
+    background: rgba(243, 240, 232, 0.18);
+  }
+
+  .progress i.on {
+    background: var(--accent);
+  }
+
+  .num {
+    font-family: var(--font-pixel);
+    font-size: clamp(48px, 5vw, 80px);
+    line-height: 1;
+    color: var(--on-dark);
+  }
+
+  .step-title {
+    font-size: 22px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  .step-body {
+    color: var(--on-dark-muted);
+    font-size: 16px;
+  }
+
+  @media (max-width: 1023px) {
+    .process-head {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .process-head .lead {
+      justify-self: start;
+    }
+
+    .steps {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .step:nth-child(3) {
+      border-left: 0;
+      padding-left: 0;
+    }
+
+    .step:nth-child(n + 3) {
+      border-top: 1px solid rgba(243, 240, 232, 0.24);
+      margin-top: 16px;
+    }
+  }
+
+  @media (max-width: 639px) {
+    .panel {
+      padding: 32px 20px;
+      border-radius: 12px;
+    }
+
+    .steps {
+      grid-template-columns: 1fr;
+    }
+
+    .step,
+    .step + .step {
+      padding: 24px 0 8px;
+      border-left: 0;
+    }
+
+    .step + .step {
+      border-top: 1px solid rgba(243, 240, 232, 0.24);
+      margin-top: 0;
+    }
+
+    .num {
+      font-size: 44px;
+    }
+  }
+</style>
