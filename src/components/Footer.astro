@@ -1,0 +1,191 @@
+---
+import { profile } from '../data/profile';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="closing" id="kontak">
+  <div class="wrap closing-inner">
+    <div class="contact">
+      {
+        profile.availability && (
+          <p class="px-label availability">
+            <span class="dot" aria-hidden="true" />
+            {profile.availability}
+          </p>
+        )
+      }
+      <h2 class="contact-title">Satu email untuk memulai proyek bersama {profile.name}</h2>
+      {profile.replyNote && <p class="lead">{profile.replyNote}</p>}
+
+      <div class="actions">
+        <a class="btn" href={`mailto:${profile.email}`}>Kirim email</a>
+        {
+          profile.cvFile && (
+            <a class="btn btn--ghost" href={profile.cvFile} download>
+              Unduh CV
+            </a>
+          )
+        }
+      </div>
+
+      {
+        profile.socials.length > 0 && (
+          <ul class="socials">
+            {profile.socials.map((s) => (
+              <li>
+                <a class="link" href={s.url} rel="me noopener" target="_blank">
+                  {s.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+
+    <div class="bottom">
+      <div class="wordmark" data-wordmark-root>
+        <p class="wordmark-text" data-wordmark-text aria-hidden="true">{profile.name}</p>
+        <canvas class="wordmark-canvas" data-wordmark aria-hidden="true"></canvas>
+      </div>
+
+      <div class="legal">
+        <p>© {year} {profile.name}</p>
+        <p>
+          Dibuat dengan <a class="link" href="https://astro.build" rel="noopener" target="_blank">Astro</a>
+        </p>
+        <a class="link" href="/#atas">Kembali ke atas</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  import { mountPixelWordmark } from '../scripts/pixelWordmark';
+  const root = document.querySelector<HTMLElement>('[data-wordmark-root]');
+  if (root) mountPixelWordmark(root);
+</script>
+
+<style>
+  /* layar penutup: ajakan kontak di atas, nama piksel dan baris legal di dasar */
+  .closing {
+    min-height: 100svh;
+    padding: calc(var(--cell) * 15) 0 calc(var(--cell) * 4);
+    border-top: 2px solid var(--ink);
+    display: flex;
+  }
+
+  .closing-inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 64px;
+  }
+
+  .contact {
+    display: grid;
+    justify-items: start;
+    gap: 28px;
+  }
+
+  .availability {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ink);
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+  }
+
+  .contact-title {
+    font-size: clamp(44px, 7vw, 112px);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+    max-width: 15ch;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 32px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .socials a {
+    display: inline-block;
+    padding: 10px 0;
+  }
+
+  .wordmark {
+    position: relative;
+  }
+
+  /* teks asli tetap ada sebagai cadangan tanpa JavaScript */
+  .wordmark-text {
+    font-family: var(--font-pixel);
+    font-size: clamp(56px, 13vw, 220px);
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-transform: uppercase;
+  }
+
+  .wordmark.has-canvas .wordmark-text {
+    display: none;
+  }
+
+  .wordmark-canvas {
+    width: 100%;
+    touch-action: pan-y;
+  }
+
+  .wordmark:not(.has-canvas) .wordmark-canvas {
+    display: none;
+  }
+
+  .legal {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px 32px;
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-strong);
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+
+  .legal a {
+    display: inline-block;
+    padding: 10px 0;
+    color: var(--ink);
+  }
+
+  @media (max-width: 639px) {
+    .closing {
+      padding-top: calc(var(--cell) * 14);
+    }
+
+    .actions .btn {
+      flex: 1 1 100%;
+    }
+
+    .actions {
+      width: 100%;
+    }
+  }
+</style>
