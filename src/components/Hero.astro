@@ -1,0 +1,316 @@
+---
+import { profile } from '../data/profile';
+
+const swatches = [
+  { id: 0, label: 'Tinta', colour: 'var(--ink)' },
+  { id: 1, label: 'Kobalt', colour: 'var(--cobalt)' },
+  { id: 2, label: 'Oranye', colour: 'var(--accent)' },
+];
+---
+
+<section class="hero" id="atas" data-hero>
+  <div class="board-wrap" aria-hidden="true"><canvas class="board pixelated" data-board></canvas></div>
+
+  <div class="wrap hero-grid">
+    <h1 class="hero-title">
+      <span class="ln"><span>{profile.name},</span></span>
+      <span class="ln"><span>{profile.role}</span></span>
+      <span class="ln"><span>di {profile.city}.</span></span>
+    </h1>
+
+    <div class="hero-side">
+      <p class="lead">{profile.intro}</p>
+      {profile.availability && <p class="px-label availability"><span class="dot" aria-hidden="true"></span>{profile.availability}</p>}
+      <div class="actions">
+        <a class="btn" href={`mailto:${profile.email}`}>Kirim email</a>
+        <a class="btn btn--ghost" href="#karya">Lihat karya</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap hero-tools">
+    <div class="toolbar" role="group" aria-label="Kuas piksel">
+      <span class="px-label tb-label">Kuas</span>
+      {
+        swatches.map((s) => (
+          <button
+            type="button"
+            class="swatch"
+            data-swatch={s.id}
+            aria-pressed={s.id === 2 ? 'true' : 'false'}
+            style={`--sw: ${s.colour}`}
+          >
+            <span class="visually-hidden">Warna {s.label}</span>
+          </button>
+        ))
+      }
+      <span class="tb-sep" aria-hidden="true"></span>
+      <button type="button" class="tb-btn" data-keep aria-pressed="false">Gambar tetap</button>
+      <button type="button" class="tb-btn" data-clear>Bersihkan</button>
+      <button type="button" class="tb-btn" data-save>Simpan PNG</button>
+    </div>
+    <p class="px-label hint">Gerakkan kursor di area ini untuk menggambar. Di ponsel, ketuk.</p>
+    <p class="visually-hidden" role="status" data-board-status></p>
+  </div>
+</section>
+
+<script>
+  import { mountPixelBoard } from '../scripts/pixelBoard';
+  const hero = document.querySelector<HTMLElement>('[data-hero]');
+  if (hero) mountPixelBoard(hero);
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    height: 100svh;
+    min-height: 600px;
+    padding-top: var(--header-h);
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .board-wrap {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+  }
+
+  /* di ponsel isi hero bisa lebih tinggi dari layar: biarkan memanjang */
+  @media (max-width: 639px) {
+    .hero {
+      height: auto;
+      min-height: 100svh;
+    }
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    gap: 48px;
+    padding-top: 56px;
+    align-items: start;
+  }
+
+  /* kotak teks berlatar kertas: piksel mengalir di sekitarnya, teks selalu terbaca */
+  .hero-title,
+  .hero-side,
+  .toolbar,
+  .hint {
+    background: var(--paper);
+  }
+
+  .hero-title {
+    font-size: clamp(44px, 6.6vw, 104px);
+    line-height: 0.94;
+    letter-spacing: -0.045em;
+    font-weight: 500;
+    padding: 0 16px 12px 0;
+    justify-self: start;
+  }
+
+  .ln {
+    display: block;
+  }
+
+  .ln > span {
+    display: block;
+    animation: lineIn 0.7s steps(5) both;
+  }
+
+  .ln:nth-child(2) > span {
+    animation-delay: 0.08s;
+  }
+
+  .ln:nth-child(3) > span {
+    animation-delay: 0.16s;
+  }
+
+  .ln:nth-child(3) {
+    color: var(--muted);
+  }
+
+  /* baris naik dalam lima langkah tegas; clip-path menggantikan overflow agar huruf tidak terpotong */
+  @keyframes lineIn {
+    from {
+      transform: translateY(60%);
+      clip-path: inset(0 -5% 100% -5%);
+    }
+    to {
+      transform: none;
+      clip-path: inset(-20% -5% -30% -5%);
+    }
+  }
+
+  .hero-side {
+    display: grid;
+    gap: 24px;
+    padding: 16px 0 16px 24px;
+    border-left: 2px solid var(--ink);
+    margin-top: 8px;
+  }
+
+  .availability {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ink);
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    flex: none;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .hero-tools {
+    grid-row: 3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 24px;
+  }
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 6px;
+    box-shadow: inset 0 0 0 2px var(--ink);
+    clip-path: var(--px-corners);
+  }
+
+  .tb-label {
+    padding: 0 8px 0 6px;
+    color: var(--ink);
+  }
+
+  .swatch {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    display: grid;
+    place-items: center;
+  }
+
+  .swatch::before {
+    content: '';
+    width: 24px;
+    height: 24px;
+    background: var(--sw);
+    transition: transform var(--m-out) var(--m-ease);
+  }
+
+  .swatch[aria-pressed='true']::before {
+    box-shadow:
+      0 0 0 3px var(--paper),
+      0 0 0 5px var(--ink);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .swatch:hover::before {
+      transform: translateY(-1px);
+    }
+  }
+
+  .tb-sep {
+    width: 2px;
+    height: 28px;
+    background: var(--line-strong);
+    margin: 0 4px;
+  }
+
+  .tb-btn {
+    min-height: 44px;
+    padding: 0 14px;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font: 500 15px/1 var(--font-sans);
+    transition: background-color var(--m-out) var(--m-ease);
+  }
+
+  .tb-btn[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .tb-btn:hover {
+      background: var(--paper-2);
+      transition-duration: var(--m-in);
+    }
+
+    .tb-btn[aria-pressed='true']:hover {
+      background: var(--cobalt);
+      color: #fff;
+    }
+  }
+
+  .tb-btn:active {
+    transform: translateY(1px) scale(0.985);
+  }
+
+  .hint {
+    padding: 4px 8px;
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 1023px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+      padding-top: 40px;
+    }
+
+    .hero-side {
+      max-width: 560px;
+    }
+  }
+
+  @media (max-width: 639px) {
+    .hero-grid {
+      padding-top: 32px;
+    }
+
+    .hero-side {
+      padding-left: 16px;
+    }
+
+    .actions .btn {
+      flex: 1 1 100%;
+    }
+
+    .hero-tools {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .toolbar {
+      justify-content: center;
+    }
+
+    .tb-label,
+    .tb-sep {
+      display: none;
+    }
+
+    .hint {
+      text-align: center;
+    }
+  }
+</style>
