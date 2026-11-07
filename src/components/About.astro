@@ -1,0 +1,161 @@
+---
+import { about, profile } from '../data/profile';
+---
+
+<section class="screen about" id="tentang">
+  <div class="wrap about-grid">
+    <div class="about-head">
+      <h2 class="h-section">{about.heading}</h2>
+      {
+        profile.photo ? (
+          <img class="portrait" src={profile.photo} alt={`Foto ${profile.name}`} width="480" height="600" loading="lazy" />
+        ) : (
+          <div class="portrait portrait--initials" role="img" aria-label={`Inisial ${profile.name}`}>
+            <span aria-hidden="true">{profile.initials}</span>
+          </div>
+        )
+      }
+    </div>
+
+    <div class="about-body">
+      {about.paragraphs.map((p) => <p class="lead">{p}</p>)}
+
+      {
+        about.tools.length > 0 && (
+          <dl class="tools">
+            {about.tools.map((t) => (
+              <div class="tool-row">
+                <dt class="px-label">{t.group}</dt>
+                <dd>
+                  <ul>
+                    {t.items.map((i) => (
+                      <li>{i}</li>
+                    ))}
+                  </ul>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-grid {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: clamp(32px, 6vw, 96px);
+    align-items: start;
+  }
+
+  .about-head {
+    display: grid;
+    gap: 40px;
+    justify-items: start;
+  }
+
+  .portrait {
+    width: min(100%, 320px);
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+
+  /* penanda foto: inisial dengan huruf piksel di atas pola dither */
+  .portrait--initials {
+    display: grid;
+    place-items: center;
+    background:
+      conic-gradient(var(--ink) 25%, transparent 0 50%, var(--ink) 0 75%, transparent 0) 0 0 / 8px 8px,
+      var(--cobalt);
+    background-blend-mode: normal;
+    position: relative;
+  }
+
+  .portrait--initials::before {
+    content: '';
+    position: absolute;
+    inset: 16% 12%;
+    background: var(--paper);
+    clip-path: var(--px-corners);
+  }
+
+  .portrait--initials span {
+    position: relative;
+    font-family: var(--font-pixel);
+    font-size: clamp(72px, 8vw, 120px);
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  .about-body {
+    display: grid;
+    gap: 24px;
+    padding-top: 12px;
+  }
+
+  .about-body .lead {
+    max-width: 58ch;
+  }
+
+  .tools {
+    margin: 24px 0 0;
+    border-top: 2px solid var(--ink);
+  }
+
+  .tool-row {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 16px;
+    align-items: baseline;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  .tool-row dd {
+    margin: 0;
+  }
+
+  .tool-row ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tool-row li {
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  @media (max-width: 899px) {
+    .about-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .about-head {
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 24px;
+      width: 100%;
+    }
+
+    .portrait {
+      width: 140px;
+    }
+
+    .portrait--initials span {
+      font-size: 48px;
+    }
+  }
+
+  @media (max-width: 639px) {
+    .tool-row {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+  }
+</style>
