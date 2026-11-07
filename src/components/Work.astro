@@ -1,0 +1,381 @@
+---
+import { projects } from '../data/profile';
+import Cover from './Cover.astro';
+
+const [featured, ...rest] = projects;
+const years = projects.map((p) => p.year);
+const span =
+  projects.length === 0
+    ? ''
+    : Math.min(...years) === Math.max(...years)
+      ? `${Math.max(...years)}`
+      : `${Math.min(...years)} sampai ${Math.max(...years)}`;
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<section class="screen work" id="karya">
+  <div class="wrap">
+    <div class="work-head">
+      <h2 class="h-section">Karya pilihan</h2>
+      {projects.length > 0 && <p class="px-label">{projects.length} proyek, {span}</p>}
+    </div>
+
+    {
+      projects.length === 0 && (
+        <div class="empty">
+          <p class="px-label">Belum ada proyek</p>
+          <p>
+            Tambahkan proyek pertama Anda di <code>src/data/profile.ts</code>, lalu bagian ini terisi otomatis.
+          </p>
+        </div>
+      )
+    }
+
+    {
+      featured && (
+        <article class="featured dark">
+          <a class="featured-media" href={`/karya/${featured.slug}/`} tabindex="-1" aria-hidden="true">
+            <Cover project={featured} />
+          </a>
+          <div class="featured-body">
+            <p class="px-label">
+              {pad(1)} / {featured.kind}, {featured.year}
+            </p>
+            <h3 class="featured-title">{featured.title}</h3>
+            <p class="featured-summary">{featured.summary}</p>
+            <dl class="meta">
+              <div>
+                <dt class="px-label">Peran</dt>
+                <dd>{featured.role}</dd>
+              </div>
+              <div>
+                <dt class="px-label">Alat</dt>
+                <dd>{featured.tools.join(', ')}</dd>
+              </div>
+            </dl>
+            <a class="btn" href={`/karya/${featured.slug}/`}>
+              Baca studi kasus
+            </a>
+          </div>
+        </article>
+      )
+    }
+  </div>
+</section>
+
+{
+  rest.length > 0 && (
+    <section class="screen archive" id="arsip">
+      <div class="wrap">
+        <h2 class="h-section">Proyek lainnya</h2>
+        <div class="archive-grid">
+          <ol class="index" data-index>
+            {rest.map((p, i) => (
+              <li>
+                <a class="row" href={`/karya/${p.slug}/`} data-preview={p.slug}>
+                  <span class="px-label n">{pad(i + 2)}</span>
+                  <span class="row-thumb" aria-hidden="true">
+                    <Cover project={p} />
+                  </span>
+                  <span class="row-main">
+                    <span class="row-title">{p.title}</span>
+                    <span class="row-kind">{p.kind}</span>
+                  </span>
+                  <span class="row-year">{p.year}</span>
+                  <svg
+                    class="row-arrow"
+                    viewBox="0 0 12 12"
+                    width="16"
+                    height="16"
+                    aria-hidden="true"
+                    shape-rendering="crispEdges"
+                  >
+                    <path fill="currentColor" d="M0 5h8V3h2v2h2v2h-2v2H8V7H0z" />
+                  </svg>
+                </a>
+              </li>
+            ))}
+          </ol>
+
+          <div class="preview" aria-hidden="true">
+            {rest.map((p, i) => (
+              <div class={`preview-item${i === 0 ? ' on' : ''}`} data-preview-item={p.slug}>
+                <Cover project={p} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<script>
+  // panel pratinjau mengikuti baris yang di-hover atau difokus
+  const list = document.querySelector<HTMLElement>('[data-index]');
+  const items = document.querySelectorAll<HTMLElement>('[data-preview-item]');
+  const show = (slug?: string) => {
+    if (!slug) return;
+    items.forEach((it) => it.classList.toggle('on', it.dataset.previewItem === slug));
+  };
+  list?.querySelectorAll<HTMLAnchorElement>('[data-preview]').forEach((row) => {
+    row.addEventListener('pointerenter', () => show(row.dataset.preview));
+    row.addEventListener('focus', () => show(row.dataset.preview));
+  });
+</script>
+
+<style>
+  .work-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+
+  .empty {
+    display: grid;
+    gap: 8px;
+    padding: 48px;
+    box-shadow: inset 0 0 0 2px var(--line-strong);
+  }
+
+  .empty code {
+    font-family: var(--font-pixel);
+  }
+
+  /* proyek unggulan: panel gelap, satu-satunya kontras besar di bagian ini */
+  .featured {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: clamp(24px, 4vw, 56px);
+    align-items: center;
+    padding: clamp(16px, 2.4vw, 32px);
+    background: var(--ink);
+    color: var(--on-dark);
+    border-radius: var(--radius);
+  }
+
+  .featured-media {
+    display: block;
+    overflow: hidden;
+    border-radius: 8px;
+  }
+
+  .featured-media :global(.cover) {
+    transition: transform var(--m-image) var(--m-ease);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .featured:hover .featured-media :global(.cover) {
+      transform: scale(1.03);
+    }
+  }
+
+  .featured-body {
+    display: grid;
+    gap: 20px;
+    justify-items: start;
+    padding-right: clamp(0px, 2vw, 24px);
+  }
+
+  .featured-title {
+    font-size: clamp(32px, 3.6vw, 52px);
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .featured-summary {
+    color: var(--on-dark);
+    max-width: 40ch;
+  }
+
+  .meta {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px 40px;
+    margin: 0;
+  }
+
+  .meta div {
+    display: grid;
+    gap: 2px;
+  }
+
+  .meta dd {
+    margin: 0;
+  }
+
+  /* arsip: baris + panel pratinjau, bukan grid kartu seragam */
+  .archive-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(32px, 4vw, 64px);
+    align-items: start;
+    margin-top: 48px;
+  }
+
+  .index {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 2px solid var(--ink);
+  }
+
+  .index li {
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 48px 1fr auto 20px;
+    align-items: center;
+    gap: 16px;
+    min-height: 88px;
+    padding: 12px 16px;
+    text-decoration: none;
+    transition:
+      background-color var(--m-out) steps(2),
+      color var(--m-out) steps(2);
+  }
+
+  /* thumbnail hanya untuk layar tanpa panel pratinjau */
+  .row-thumb {
+    display: none;
+  }
+
+  .row-main {
+    display: grid;
+    gap: 2px;
+  }
+
+  .row-title {
+    font-size: clamp(22px, 2.2vw, 30px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+  }
+
+  .row-kind,
+  .row-year {
+    color: var(--ink-2);
+    font-size: 16px;
+  }
+
+  .row-year {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .row-arrow {
+    transition: transform var(--m-out) var(--m-ease);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .row:hover {
+      background: var(--ink);
+      color: var(--paper);
+      transition-duration: var(--m-in);
+    }
+
+    .row:hover .row-kind,
+    .row:hover .row-year,
+    .row:hover .n {
+      color: var(--on-dark-muted);
+    }
+
+    .row:hover .row-arrow {
+      transform: translateX(3px);
+    }
+  }
+
+  .row:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .preview {
+    position: sticky;
+    top: calc(var(--header-h) + 24px);
+    display: grid;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .preview-item {
+    grid-area: 1 / 1;
+    visibility: hidden;
+    clip-path: inset(0 0 100% 0);
+    transition:
+      clip-path 0.28s steps(5),
+      visibility 0s linear 0.28s;
+  }
+
+  .preview-item.on {
+    visibility: visible;
+    clip-path: inset(0 0 0 0);
+    transition:
+      clip-path 0.28s steps(5),
+      visibility 0s;
+  }
+
+  @media (max-width: 1023px) {
+    .featured {
+      grid-template-columns: 1fr;
+    }
+
+    .archive-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .preview {
+      display: none;
+    }
+
+    .row {
+      grid-template-columns: 40px 160px 1fr auto 20px;
+    }
+
+    .row-thumb {
+      display: block;
+      overflow: hidden;
+      border-radius: 6px;
+    }
+  }
+
+  @media (max-width: 639px) {
+    .work-head {
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+
+    .featured-body {
+      padding: 8px 4px;
+    }
+
+    .featured-body .btn {
+      width: 100%;
+    }
+
+    .meta {
+      grid-template-columns: 1fr;
+    }
+
+    .archive-grid {
+      margin-top: 32px;
+    }
+
+    .row {
+      grid-template-columns: 96px 1fr auto;
+      gap: 12px;
+      padding: 12px 4px;
+    }
+
+    .row .n {
+      display: none;
+    }
+
+    .row-arrow {
+      display: none;
+    }
+  }
+</style>
