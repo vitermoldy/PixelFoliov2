@@ -1,0 +1,51 @@
+---
+import type { Project } from '../data/profile';
+import { pixelCover } from '../lib/pixelCover';
+
+interface Props {
+  project: Project;
+  eager?: boolean;
+  class?: string;
+}
+
+const { project, eager = false, class: className = '' } = Astro.props;
+const cover = project.cover ? null : pixelCover(project.slug, project.tone);
+---
+
+{
+  project.cover ? (
+    <img
+      class={`cover ${className}`}
+      src={project.cover}
+      alt={`Tampilan ${project.title}`}
+      width="1600"
+      height="1000"
+      loading={eager ? 'eager' : 'lazy'}
+      fetchpriority={eager ? 'high' : 'auto'}
+      decoding="async"
+    />
+  ) : (
+    <svg
+      class={`cover ${className}`}
+      viewBox={`0 0 ${cover!.w} ${cover!.h}`}
+      width="1600"
+      height="1000"
+      preserveAspectRatio="xMidYMid slice"
+      shape-rendering="crispEdges"
+      role="img"
+      aria-label={`Sampul piksel ${project.title}`}
+    >
+      <rect width={cover!.w} height={cover!.h} fill={cover!.bg} />
+      {cover!.layers.map((l) => <path fill={l.fill} d={l.d} />)}
+    </svg>
+  )
+}
+
+<style>
+  .cover {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+  }
+</style>
