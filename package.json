@@ -1,0 +1,22 @@
+{
+  "name": "pixelfolio",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Template portofolio dengan motif piksel, dibangun dengan Astro.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@fontsource/schibsted-grotesk": "^5.3.0",
+    "@fontsource/tiny5": "^5.3.0",
+    "astro": "^7.4.7"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "typescript": "^6.0.3"
+  }
+}
